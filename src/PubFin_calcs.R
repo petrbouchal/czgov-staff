@@ -92,9 +92,16 @@ plot <- ggplot(subset(budl_platy_ch, variable=='pcoverspend'),
   facet_wrap(~ orgchaptername)
 plot
 
-# chart total overspend per year - not working properly, 
-# will need to summarise manually and then chart
-plot <- ggplot(subset(budl_platy_ch, variable=='overspend'),
+# chart total overspend per year
+# summarise manually and then chart
+
+overspendsum <- ddply(bud_platy_ch, .(orgyear), summarise,
+                      overspend = sum(overspend),
+                      rozpocet = sum(rozpocet))
+overspendsum$pcoverspend <- overspendsum$overspend/overspendsum$rozpocet
+overspendsuml <- melt(overspendsum)
+
+plot <- ggplot(subset(overspendsuml, variable=='pcoverspend'),
                aes(x=orgyear, y=value, fill=orgyear, group=1))+
-  geom_bar(stat='sum',position='dodge')
+  geom_bar(stat='identity',position='dodge')
 plot
