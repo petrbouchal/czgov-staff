@@ -6,6 +6,10 @@ library(reshape2)
 require(ggplot2)
 require(scales)
 require(grid)
+require(ggthemes)
+
+
+# create dataset of sheet names and numbers to loop through ---------------
 
 sheetnums <- c(1:7,9)
 sheetnames <- c('ROPO celkem',
@@ -19,7 +23,8 @@ sheetnames <- c('ROPO celkem',
 
 sheetset <- data.frame('sheetnums'=sheetnums, 'sheetnames'=sheetnames)
 years <- c(2003:2013)
-yearnums <- c(1:11)
+
+# load data from excel file by looping through sheets and years -----------
 
 for(i in sheetset$sheetnums){
   print(i)
@@ -35,6 +40,8 @@ for(i in sheetset$sheetnums){
   }
   str(sdata)
 }
+
+# create & apply variable names -------------------------------------------
 
 varsrepeating <- c('PlatyOPPP','OPPP','Platy','Zam','AvgSal','AvGSalRank')
 varsonceayear1 <- c('AvgSalIndexSchv2schv_None')
@@ -56,6 +63,8 @@ leftheaders <- c('KapNum','KapAbb','KapName','Kap_Blank')
 allnames <- c(leftheaders,allnames,'sheetname')
 names(sdata) <- allnames
 
+# Create long dataset -----------------------------------------------------
+
 sdatal <- melt(sdata,id=c('KapNum','KapAbb','KapName','sheetname'))
 sdatal <- sdatal[sdatal$variable!='Kap_Blank',]
 for(year in years) {
@@ -70,7 +79,8 @@ table(sdatal$Year)
 table(sdatal$BudgetStage)
 table(sdatal$sheetname)
 
-# clean data a bit
+# Clean data a bit --------------------------------------------------------
+
 sdatal$Year <- as.Date(paste(sdatal$Year,'01','01',sep='-'),format='%Y-%m-%d')
 sdatal$KapName <- str_trim(sdatal$KapName)
 sdatal$KapAbb[sdatal$KapNum==353] <- 'ÚOHS'
@@ -81,14 +91,18 @@ table(sdatal$KapAbb)
 table(sdatal$KapName)
 table(sdatal$KapNum)
 
-# add TRUE/FALSE ministry marker - made in excel
-kapmin <- read.csv('./data-input/KapitolyMinisterstva.csv')
+
+# add TRUE/FALSE ministry marker - made in excel --------------------------
+
+kapmin <- read.csv('./data-input/KapitolyMinisterstva.txt')
 sdatal <- merge(sdatal,kapmin,by='KapNum')
 
-# Save data and labels - separately to save space
+
+# Write data and labels - separately to save space -------------------------
+
 #write.csv(sdatal,'./data-output/SuperData_ALL.csv')
 namestable <- unique(sdatal[,c(1:3,11)])
 sdatal <- sdatal[c(2,4,6,8:10)]
 
 #write.csv(sdatal,'./data-output/SuperData.csv')
-#write.csv(namestable,'./data-output/KapitolyNames.csv')
+#write.csv(namestable,'./data-output/KapitolyNames.txt')
