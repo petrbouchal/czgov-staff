@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 *.csv
+*.xls
+*.xlsx
+charts-output

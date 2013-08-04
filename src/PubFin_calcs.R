@@ -85,7 +85,7 @@ bud_platy_ch$pcoverspend <- bud_platy_ch$overspend/bud_platy_ch$rozpocet
 budl_platy_ch <- melt(bud_platy_ch)
 
 # chart: shows overspends per chapter by year. Can select absolute or % in subset
-plot <- ggplot(subset(budl_platy_ch, variable=='pcoverspend'),
+plot <- ggplot(subset(budl_platy_ch, variable=='overspend'),
                aes(x=orgyear, y=value, fill=orgyear,
                    group=orgchaptername))+
   geom_bar(stat='identity',position='dodge') +
