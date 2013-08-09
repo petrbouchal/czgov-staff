@@ -1,0 +1,41 @@
+"KapNum","KapAbb","KapName","Ministerstvo"
+301,"KPR","Kanceláø prezidenta",FALSE
+302,"Kparl","Parlament",FALSE
+303,"Ksen","Kanceláø Senátu",FALSE
+304,"ÚV","Úøad vlády",TRUE
+306,"MZV","Ministerstvo zahranièních vìcí",TRUE
+307,"MO","Ministerstvo obrany",TRUE
+308,"NBÚ","Národní bezpeènostní úøad",FALSE
+309,"KVOP","kanceláø veøejného ochránce práv",FALSE
+312,"MF","Ministerstvo financí",TRUE
+313,"MPSV","Ministerstvo práce a sociálních vìcí",TRUE
+314,"MV","Ministerstvo vnitra",TRUE
+315,"MŽP","Ministerstvo životního prostøedí",TRUE
+317,"MMR","Ministerstvo pro místní rozvoj",TRUE
+321,"GA","Grantová agentura",FALSE
+322,"MPO","Ministerstvo prùmyslu a obchodu",TRUE
+327,"MD","Ministerstvo dopravy",TRUE
+328,"ÈTÚ","Èeský telekomunikaèní úøad",FALSE
+329,"MZe","Ministerstvo zemìdìlství",TRUE
+333,"MŠMT","Ministerstvo školství, mládeže a tìlovýchovy",TRUE
+334,"MK","Ministerstvo kultury",TRUE
+335,"Mzdr","Ministerstvo zdravotnictví",TRUE
+336,"Mspr","Ministerstvo spravedlnosti",TRUE
+338,"MI","Ministerstvo informatiky",TRUE
+341,"ÚVIS","Úøad pro veøejné informaèní systémy",FALSE
+343,"ÚOOÚ","Úøad pro ochranu osobních údajù",FALSE
+344,"ÚPV","Úøad prùmyslového vlastnictví",FALSE
+345,"ÈSÚ","Èeský statistický úøad",FALSE
+346,"ÈÚZK","Èeský úøad zemìmìøický a katastrální",FALSE
+347,"KCP","Komise pro cenné papíry",FALSE
+348,"ÈBÚ","Èeský báòský úøad",FALSE
+349,"ERÚ","Energetický regulaèní úøad",FALSE
+353,"ÚOHS","Úøad na ochranu hospodáøské soutìže",FALSE
+355,"ÚSTR","Ústav pro studium totalitních režimù",FALSE
+358,"ÚS","Ústavní soud",FALSE
+361,"AV","Akademie vìd",FALSE
+372,"RRTV","Rada pro rozhlasové a televizní vysílání",FALSE
+374,"SSHR","Správa státních hmotných rezerv",FALSE
+375,"SÚJB","Státní úøad pro jadernou bezpeènost",FALSE
+376,"GIBS","Generální inspekce bezpeènostních sborù",FALSE
+377,"TA ÈR","Technologická agentura ÈR",FALSE

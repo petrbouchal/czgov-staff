@@ -1,41 +1,41 @@
-"","KapNum","KapAbb","KapName","Ministerstvo"
-"1",301,"KPR","Kancelář prezidenta",FALSE
-"1849",302,"Kparl","Parlament",FALSE
-"3697",303,"Ksen","Kancelář Senátu",FALSE
-"5545",304,"ÚV","Úřad vlády",TRUE
-"7393",306,"MZV","Ministerstvo zahraničních věcí",TRUE
-"9241",307,"MO","Ministerstvo obrany",TRUE
-"11089",308,"NBÚ","Národní bezpečnostní úřad",FALSE
-"12937",309,"KVOP","kancelář veřejného ochránce práv",FALSE
-"14785",312,"MF","Ministerstvo financí",TRUE
-"16633",313,"MPSV","Ministerstvo práce a sociálních věcí",TRUE
-"18481",314,"MV","Ministerstvo vnitra",TRUE
-"20329",315,"MŽP","Ministerstvo životního prostředí",TRUE
-"22177",317,"MMR","Ministerstvo pro místní rozvoj",TRUE
-"24025",321,"GA","Grantová agentura",FALSE
-"25873",322,"MPO","Ministerstvo průmyslu a obchodu",TRUE
-"27721",327,"MD","Ministerstvo dopravy",TRUE
-"29569",328,"ČTÚ","Český telekomunikační úřad",FALSE
-"31417",329,"MZe","Ministerstvo zemědělství",TRUE
-"33265",333,"MŠMT","Ministerstvo školství, mládeže a tělovýchovy",TRUE
-"35113",334,"MK","Ministerstvo kultury",TRUE
-"36961",335,"Mzdr","Ministerstvo zdravotnictví",TRUE
-"38809",336,"Mspr","Ministerstvo spravedlnosti",TRUE
-"40657",338,"MI","Ministerstvo informatiky",TRUE
-"42505",341,"ÚVIS","Úřad pro veřejné informační systémy",FALSE
-"44353",343,"ÚOOÚ","Úřad pro ochranu osobních údajů",FALSE
-"46201",344,"ÚPV","Úřad průmyslového vlastnictví",FALSE
-"48049",345,"ČSÚ","Český statistický úřad",FALSE
-"49897",346,"ČÚZK","Český úřad zeměměřický a katastrální",FALSE
-"51745",347,"KCP","Komise pro cenné papíry",FALSE
-"53593",348,"ČBÚ","Český báňský úřad",FALSE
-"55441",349,"ERÚ","Energetický regulační úřad",FALSE
-"57289",353,"ÚOHS","Úřad na ochranu hospodářské soutěže",FALSE
-"59137",355,"ÚSTR","Ústav pro studium totalitních režimů",FALSE
-"60985",358,"ÚS","Ústavní soud",FALSE
-"62833",361,"AV","Akademie věd",FALSE
-"64681",372,"RRTV","Rada pro rozhlasové a televizní vysílání",FALSE
-"66529",374,"SSHR","Správa státních hmotných rezerv",FALSE
-"68377",375,"SÚJB","Státní úřad pro jadernou bezpečnost",FALSE
-"70225",376,"GIBS","Generální inspekce bezpečnostních sborů",FALSE
-"72073",377,"TA ČR","Technologická agentura ČR",FALSE
+"KapNum","KapAbb","KapName","Ministerstvo"
+301,"KPR","Kancelář prezidenta","FALSE"
+302,"Kparl","Parlament","FALSE"
+303,"Ksen","Kancelář Senátu","FALSE"
+304,"ÚV","Úřad vlády","TRUE"
+306,"MZV","Ministerstvo zahraničních věcí","TRUE"
+307,"MO","Ministerstvo obrany","TRUE"
+308,"NBÚ","Národní bezpečnostní úřad","FALSE"
+309,"KVOP","kancelář veřejného ochránce práv","FALSE"
+312,"MF","Ministerstvo financí","TRUE"
+313,"MPSV","Ministerstvo práce a sociálních věcí","TRUE"
+314,"MV","Ministerstvo vnitra","TRUE"
+315,"MŽP","Ministerstvo životního prostředí","TRUE"
+317,"MMR","Ministerstvo pro místní rozvoj","TRUE"
+321,"GA","Grantová agentura","FALSE"
+322,"MPO","Ministerstvo průmyslu a obchodu","TRUE"
+327,"MD","Ministerstvo dopravy","TRUE"
+328,"ČTÚ","Český telekomunikační úřad","FALSE"
+329,"MZe","Ministerstvo zemědělství","TRUE"
+333,"MŠMT","Ministerstvo školství, mládeže a tělovýchovy","TRUE"
+334,"MK","Ministerstvo kultury","TRUE"
+335,"Mzdr","Ministerstvo zdravotnictví","TRUE"
+336,"Mspr","Ministerstvo spravedlnosti","TRUE"
+338,"MI","Ministerstvo informatiky","TRUE"
+341,"ÚVIS","Úřad pro veřejné informační systémy","FALSE"
+343,"ÚOOÚ","Úřad pro ochranu osobních údajů","FALSE"
+344,"ÚPV","Úřad průmyslového vlastnictví","FALSE"
+345,"ČSÚ","Český statistický úřad","FALSE"
+346,"ČÚZK","Český úřad zeměměřický a katastrální","FALSE"
+347,"KCP","Komise pro cenné papíry","FALSE"
+348,"ČBÚ","Český báňský úřad","FALSE"
+349,"ERÚ","Energetický regulační úřad","FALSE"
+353,"ÚOHS","Úřad na ochranu hospodářské soutěže","FALSE"
+355,"ÚSTR","Ústav pro studium totalitních režimů","FALSE"
+358,"ÚS","Ústavní soud","FALSE"
+361,"AV","Akademie věd","FALSE"
+372,"RRTV","Rada pro rozhlasové a televizní vysílání","FALSE"
+374,"SSHR","Správa státních hmotných rezerv","FALSE"
+375,"SÚJB","Státní úřad pro jadernou bezpečnost","FALSE"
+376,"GIBS","Generální inspekce bezpečnostních sborů","FALSE"
+377,"TA ČR","Technologická agentura ČR","FALSE"

@@ -91,18 +91,16 @@ table(sdatal$KapAbb)
 table(sdatal$KapName)
 table(sdatal$KapNum)
 
-
 # add TRUE/FALSE ministry marker - made in excel --------------------------
 
 kapmin <- read.csv('./data-input/KapitolyMinisterstva.txt')
-sdatal <- merge(sdatal,kapmin,by='KapNum')
-
+sdatal <- merge(sdatal,kapmin)
 
 # Write data and labels - separately to save space -------------------------
 
 #write.csv(sdatal,'./data-output/SuperData_ALL.csv')
 namestable <- unique(sdatal[,c(1:3,11)])
-sdatal <- sdatal[c(2,4,6,8:10)]
+sdatal <- sdatal[c(1,4,6,8:10)]
 
-#write.csv(sdatal,'./data-output/SuperData.csv')
-#write.csv(namestable,'./data-output/KapitolyNames.txt')
+write.csv(sdatal,'./data-output/SuperData.csv',row.names=FALSE)
+write.csv(namestable,'./data-output/KapitolyNames.txt',row.names=FALSE)
