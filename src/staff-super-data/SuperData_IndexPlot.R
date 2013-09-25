@@ -1,11 +1,12 @@
 source('./src/lib/lib_PubFinCZ.R')
 
 # source('./src/SuperData_ReadXLS.R')
-#uu0 <- LoadDataforPlotting()
+uu0 <- LoadDataforPlotting()
 
 uu <- uu0
 uu <- uu[uu$Udaj=='AvgSalIndexSchv2schv' | uu$Udaj=='AvgSalIndexSkut2skut',]
 uu <- uu[uu$sheetname=='UO' & uu$Ministerstvo==TRUE,]
+uu <- uu[uu$Year=='2012-01-01']
 
 #deflate
 uu$value <- uu$value/uu$Inflation

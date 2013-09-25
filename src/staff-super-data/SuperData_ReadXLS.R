@@ -1,13 +1,4 @@
-library(xlsx)
-library(stringr)
-library(plyr)
-library(reshape)
-library(reshape2)
-require(ggplot2)
-require(scales)
-require(grid)
-require(ggthemes)
-
+source('./src/lib/lib_PubFinCZ.R')
 
 # create dataset of sheet names and numbers to loop through ---------------
 
@@ -102,5 +93,5 @@ sdatal <- merge(sdatal,kapmin)
 namestable <- unique(sdatal[,c(1:3,11)])
 sdatal <- sdatal[c(1,4,6,8:10)]
 
-write.csv(sdatal,'./data-output/SuperData.csv',row.names=FALSE)
+write.csv(sdatal,'./data-output/SuperData_chapters.csv',row.names=FALSE)
 write.csv(namestable,'./data-output/KapitolyNames.txt',row.names=FALSE)
