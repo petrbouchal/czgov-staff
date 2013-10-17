@@ -20,7 +20,7 @@ years <- c(2003:2013)
 for(i in sheetset$sheetnums){
   print(i)
   sdata0 <- read.xlsx('./data-input/MFCR_SuperData.xls',i,
-                     startRow=5,endRow=45,colIndex=c(3:248))
+                     startRow=5,endRow=46,colIndex=c(3:248))
   names(sdata0) <- paste0('var',1:ncol(sdata0))
   sdata0$sheetname <- sheetset$sheetname[sheetset$sheetnum==i]
   str(sdata0)

@@ -39,3 +39,4 @@
 375,"SÚJB","Státní úřad pro jadernou bezpečnost",FALSE
 376,"GIBS","Generální inspekce bezpečnostních sborů",FALSE
 377,"TA ČR","Technologická agentura ČR",FALSE
+381,"NKÚ","Nejvyšší kontrolní úřad",FALSE

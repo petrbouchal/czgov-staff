@@ -1,21 +1,22 @@
 source('./src/lib/lib_PubFinCZ.R')
-
+  
 #source('./src/SuperData_ReadXLS.R')
 
-uu0 <- LoadDataforPlotting('chapters')
+#uu0 <- LoadDataforPlotting('chapters')
 
 uu <- uu0
-#uu <- uu[uu$Udaj=='AvgSalIndexSchv2schv' | uu$Udaj=='AvgSalIndexSkut2skut',]
+uu <- uu[uu$Udaj=='AvgSalIndexSchv2schv' | uu$Udaj=='AvgSalIndexSkut2skut',]
 uu <- uu[uu$Udaj=='Zam',]
 uu <- uu[uu$sheetname=='UO' & uu$BudgetStage=='skutecnost',]
 uu <- uu[uu$Year=='2012-01-01',]
 
-sum(uu$value, na.rm=T)
+uu <- uu0
 
-uu1 <- LoadDataforPlotting('orgs')
-
-unique(uu1$OrgName)
-
-uu2 <- uu1[uu1$Udaj=='PlatyOPPP' & uu1$BudgetStage=='schvaleny' & uu1$Year=='2012-01-01' &
-               uu1$OrgName=='Celkem',]
-sum(uu1$value, na.rm=T)
+#This should equal total in ROPO table in XLS
+uu <- uu[uu$BudgetStage=='schvaleny',]
+sum(uu$value[uu$Year=='2013-01-01' & uu$Udaj=='PlatyOPPP' & uu$sheetname=='OOSS'])
+sum(uu$value[uu$Year=='2013-01-01' & uu$Udaj=='PlatyOPPP' & uu$sheetname=='ROPO celkem'])
+sum(uu$value[uu$Year=='2013-01-01' & uu$Udaj=='PlatyOPPP' & uu$sheetname=='OSS-SS'])
+sum(uu$value[uu$Year=='2013-01-01' & uu$Udaj=='PlatyOPPP' & uu$sheetname=='UO'])
+sum(uu$value[uu$Year=='2004-01-01' & uu$Udaj=='PlatyOPPP' & uu$sheetname=='PO'],na.rm=T)
+sum(uu$value[uu$Year=='2004-01-01' & uu$Udaj=='PlatyOPPP' & uu$sheetname=='ROPO celkem'],na.rm=T)
