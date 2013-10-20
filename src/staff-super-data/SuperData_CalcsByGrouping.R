@@ -1,67 +1,140 @@
+# Load and prep -----------------------------------------------------------
+
 source('./src/lib/lib_PubFinCZ.R')
 uu0 <- LoadDataforPlotting('chapters')
 uu <- uu0
 
+# MV causes distortions (2011-12 reclass of police in core MV) - can exclude
+uu$todiscard <- FALSE
+uu$todiscard[uu$KapAbb=='MV' & uu$sheetname=='UO'] <- TRUE
+uu <- uu[uu$todiscard==FALSE,]
+
+source('./src/staff-super-data/SuperData_FirstReshapeAndCalcs.R')
+
 # summarise by layer of civil service
-hh <- ddply(uu,.(Year,grouping,Udaj,BudgetStage), summarise,
+hh <- ddply(uu,.(Year,grouping,groupingsum,Udaj,BudgetStage), summarise,
             value=sum(value, na.rm=T),
             .progress = "text")
 
-# add variable for base value and change from base vars
-hh <- AddBaseValue(hh,'2003-01-01',2:7)
+# Calculate indices and changes between budget stages ---------------------
 
-hh$YearDate <- hh$Year
-hh$Year <- as.character(hh$Year)
-hh <- AddDeflators(hh)
-
-plot <- ggplot(hh[hh$Udaj=='Zam' & hh$BudgetStage=='schvaleny',],
-               aes(YearDate, value, colour=grouping)) +
-  geom_line() +
-  scale_y_continuous(labels=comma)
-plot
-
-plot <- ggplot(hh[hh$Udaj=='Zam' & hh$value!=0,],
-               aes(Year, perc_base, colour=BudgetStage)) +
-  geom_line(aes(group=BudgetStage),size=1) +
-  scale_y_continuous(labels=percent) +
-  facet_wrap(~ grouping,scales='free_y') +
-  theme(legend.key.width=unit(2,'cm'))
-plot
-
-hh <- hh[hh$Udaj=='PlatyOPPP' | hh$Udaj=='Platy' | hh$Udaj=='OPPP' | hh$Udaj=='Zam',]
+# reshape to wide - expand variables
 hh$UdajStage <- paste0(hh$Udaj,'_',hh$BudgetStage)
 hh$Udaj <- NULL
 hh$BudgetStage <- NULL
 
-# reshape
-hhw <- cast(hh,grouping+Year~UdajStage)
-hhw$Platy_upr2skut <- hhw$Platy_upraveny/hhw$Platy_skutecnost
-hhw$Zam_upr2skut <- hhw$Zam_upraveny/hhw$Zam_skutecnost
-hhw$OPPP_upr2skut <- hhw$OPPP_upraveny/hhw$OPPP_skutecnost
+hhw2 <- cast(hh,grouping+Year+groupingsum~UdajStage)
 
 # calculate average pay and indices
-hhw$AvgSal_upraveny <- hhw$Platy_upraveny/hhw$Zam_upraveny*1000/12
-hhw$AvgSal_skutecnost <- hhw$Platy_skutecnost/hhw$Zam_skutecnost*1000/12
-hhw$AvgSal_upr2skut <- hhw$AvgSal_upraveny/hhw$AvgSal_skutecnost
-hhw$AvgSal_uprMinusskut <- hhw$AvgSal_upraveny-hhw$AvgSal_skutecnost
+hhw2 <- CalcAvgsAndIndices(hhw2)
 
-# plots
-plot <- ggplot(hhw, aes(x=Year, y=-AvgSal_uprMinusskut, fill=Zam_skutecnost)) +
+# turn back into long
+hhw2 <- as.data.frame(hhw2)
+hh <- melt(hhw2, id.vars=c('Year','grouping','groupingsum'))
+
+hh <- AddBaseValue(hh,'2003-01-01')
+hh <- AddEconIndicators(hh)
+hh$realchange <- hh$perc_base/hh$Infl2003Base
+
+# create markers for budget stages and type of data (budget x index)
+# HERE
+
+# create markers for groups of groupings
+hh$exekutiva <- FALSE
+hh$exekutiva[hh$grouping=='UO - Ministerstva' | hh$grouping=='UO - Ostatní' | 
+               hh$grouping=='OSS-SS']  <- TRUE
+hh$UO <- FALSE
+hh$UO[hh$grouping=='UO - Ministerstva' | hh$grouping=='UO - Ostatní'] <- TRUE
+
+
+# Plots -------------------------------------------------------------------
+
+# % changes to nominal average salary by grouping
+hh2 <- hh[hh$groupingsum==FALSE & hh$Year!='2013-01-01' & hh$variable=='Zam_skutecnost',]
+plot <- ggplot(hh2,aes(Year, perc_base, colour=grouping, group=grouping)) +
+  geom_line(size=1) +
+  scale_y_continuous(labels=percent)
+plot
+
+# % changes to real average salary by grouping
+hh2 <- hh[hh$groupingsum==FALSE & hh$variable=='Platy_upraveny',]
+plot <- ggplot(hh2, aes(Year, realchange, colour=grouping, group=grouping)) +
+  geom_line(size=1) +
+  scale_y_continuous(labels=percent)
+plot
+
+#paybill turnout
+hh2 <- hh[hh$groupingsum==FALSE & hh$Year!='2013-01-01' & hh$variable=='Platy_skutecnost',]
+plot <- ggplot(hh2,aes(Year, value, fill=grouping, group=grouping)) +
+  geom_area(stat='identity',position='stack') +
+  scale_y_continuous(labels=comma)
+plot
+
+# paybill adjusted for inflation by grouping, turnout
+hh2 <- hh[hh$groupingsum==FALSE & hh$Year!='2013-01-01' & hh$variable=='Platy_skutecnost',]
+plot <- ggplot(hh2,aes(Year, value/Infl2003Base, fill=grouping, group=grouping)) +
+  geom_area(stat='identity',position='stack') +
+  scale_y_continuous(labels=comma)
+plot
+
+# staff numbers by grouping, as budgeted
+hh2 <- hh[hh$groupingsum==FALSE & hh$Year!='2013-01-01',]
+hh2 <- hh2[with(hh2, order(grouping)), ]
+plot <- ggplot(hh2[hh2$variable=='Zam_upraveny',],
+               aes(Year, value, fill=grouping, group=grouping)) +
+  geom_area(stat='identity',position='stack') +
+  scale_y_continuous(labels=comma)
+plot
+
+# staff gap by grouping, as budgeted
+hh2 <- hh[hh$groupingsum==FALSE & hh$Year!='2013-01-01' & hh$variable=='Zam_upr2skut',]
+hh2 <- hh2[with(hh2, order(grouping)), ]
+plot <- ggplot(hh2, aes(Year, value-1, fill=grouping, group=grouping)) +
+  geom_bar(stat='identity',position='dodge') +
+  scale_y_continuous(labels=comma) + facet_wrap(~grouping)
+plot
+
+# salary 'raise' budgeting effect, by grouping
+hh2 <- hh[hh$variable=='AvgSal_uprMinusskut' & hh$groupingsum==F,]
+plot <- ggplot(hh2, aes(x=Year, y=-value, fill=grouping)) +
   geom_bar(stat='identity') +
-  scale_fill_continuous(low='yellow',high='red') +
+  facet_wrap(~grouping)
+plot
+
+hh2 <- hh[hh$variable=='AvgSal_skutecnost',]
+plot <- ggplot(hh2,aes(x=Year, y=perc_base/Infl2003Base,group=grouping)) +
+  geom_line(size=1,aes(colour=grouping)) + theme_classic() +
+  scale_y_continuous(labels=percent)
+plot
+
+# average salary as budgeted, as % of national average salary
+hh2 <- hh[hh$variable=='AvgSal_schvaleny',]
+plot <- ggplot(hh2,aes(x=Year, y=value/czsal_all,group=grouping)) +
+  geom_line(size=1,aes(colour=grouping)) + theme_classic() +
+  scale_y_continuous(labels=percent)
+plot
+
+# average salary, as budgeted and turnout, real change from 2003
+#in this one the adjustment for top managers is incorrectly deflated
+hh2 <- hh[hh$variable=='AvgSal_skutecnost' | hh$variable=='AvgSal_upraveny',]
+plot <- ggplot(hh2,
+               aes(x=Year, y=value, group=variable)) +
+  geom_line(size=1, aes(y=(value-1120)/(value_base-1120)/Infl2003Base,colour=variable)) +
+  geom_line(size=1, aes(y=czsal_all/czsal_all_2003/Infl2003Base),colour='yellow') +
+  geom_line(data=hh2[hh2$grouping=='UO - Ministerstva',],size=1,
+            aes(y=phasal_all/phasal_all_2003/Infl2003Base,),colour='black') +
   facet_wrap(~grouping) + theme_classic()
 plot
 
-plot <- ggplot(hhw, aes(x=Year, y=AvgSal_skutecnost, fill=Zam_skutecnost)) +
-  geom_line(size=1,aes(y=AvgSal_skutecnost),colour='red') +
-  geom_line(size=1, aes(y=AvgSal_upraveny),colour='yellow') +
-  scale_fill_continuous(low='yellow',high='red') +
-  facet_wrap(~grouping) + theme_classic()
-plot
-
-plot <- ggplot(hhw[hhw$Platy_skutecnost!=0,], aes(x=Year, fill=Zam_skutecnost)) +
-  geom_line(size=1,aes(y=Platy_skutecnost),colour='red') +
-  geom_line(size=1, aes(y=Platy_upraveny),colour='yellow') +
-  scale_fill_continuous(low='yellow',high='red') +
+#in this one the adjustment for top managers is incorrectly deflated
+hh2 <- hh[hh$variable=='AvgSal_skutecnost' | hh$variable=='AvgSal_upraveny',]
+plot <- ggplot(hh2,aes(x=Year, y=value, group=variable)) +
+  geom_line(size=1,data=hh2[hh2$grouping!='UO - Ministerstva',],
+            aes(y=value/czsal_all,colour=variable)) +
+  geom_line(size=1,data=hh2[hh2$grouping=='UO - Ministerstva',],
+            aes(y=value/phasal_all,colour=variable)) +
+  geom_line(size=1,data=hh2[hh2$grouping=='UO - Ministerstva',],
+            aes(y=(value-1120/Infl2003Base)/phasal_all,colour=variable),
+            linetype='dashed') +
   facet_wrap(~grouping) + theme_classic()
 plot

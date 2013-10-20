@@ -1,81 +1,91 @@
-source('./src/lib/lib_PubFinCZ.R')
-#uu0 <- LoadDataforPlotting('chapters')
+# Load and prep -----------------------------------------------------------
 
+source('./src/lib/lib_PubFinCZ.R')
+uu0 <- LoadDataforPlotting('chapters')
 uu <- uu0
 
-uu$grouping <- as.character(uu$sheetname)
-uu$grouping[uu$sheetname=='UO' & uu$Ministerstvo==TRUE]  <- 'UO - Ministerstva'
-uu$grouping[uu$sheetname=='UO' & uu$Ministerstvo==FALSE]  <- 'UO - Ostatní'
+source('./src/staff-super-data/SuperData_FirstReshapeAndCalcs.R')
 
-uu <- uu[uu$Udaj=='PlatyOPPP' | uu$Udaj=='Platy' | uu$Udaj=='OPPP' | uu$Udaj=='Zam',]
+# Calculate indices and changes between budget stages ---------------------
+
+# reshape to wide - expand variables
 uu$UdajStage <- paste0(uu$Udaj,'_',uu$BudgetStage)
 uu$Udaj <- NULL
 uu$BudgetStage <- NULL
-uu$rok <- as.character(uu$Year)
-uu$grouping <- as.character(uu$sheetname)
-uu$grouping[uu$sheetname=='UO' & uu$Ministerstvo==TRUE]  <- 'UO - Ministerstva'
-uu$grouping[uu$sheetname=='UO' & uu$Ministerstvo==FALSE]  <- 'UO - Ostatní'
 
-#create wide dataset
-uuw <- cast(uu,KapNum+KapAbb+KapName+grouping+Year~UdajStage, .progress='text')
+uuw2 <- cast(uu,grouping+Year+KapAbb+KapNum+KapName+Ministerstvo+groupingsum~UdajStage)
 
-# calculate means and indices
-uuw$AvgSal_upraveny <- uuw$Platy_upraveny/uuw$Zam_upraveny*1000/12
-uuw$AvgSal_skutecnost <- uuw$Platy_skutecnost/uuw$Zam_skutecnost*1000/12
-uuw$Zam_upr2skut <- uuw$Zam_skutecnost/uuw$Zam_upraveny
-uuw$AvgSal_skutMinusupr <- uuw$AvgSal_skutecnost-uuw$AvgSal_upraveny
-uuw$AvgSal_skutPercupr <- uuw$AvgSal_skutMinusupr/uuw$AvgSal_upraveny
+# calculate average pay and indices
+uuw2 <- CalcAvgsAndIndices(uuw2)
 
-# melt this back into long format
-uuw <- as.data.frame(uuw)
-uu <- melt(uuw,id.vars=c('KapNum','KapAbb','KapName','Year','grouping'))
+# turn back into long
+uuw2 <- as.data.frame(uuw2)
+uu <- melt(uuw2, id.vars=c('Year','grouping','KapAbb','KapName','KapNum','groupingsum','Ministerstvo'))
 
-# create marker for index and pure budget data
+uu <- AddBaseValue(uu,'2003-01-01')
+uu <- AddEconIndicators(uu)
+
+# create markers for budget stages and type of data (budget x index)
 # HERE
 
-# separate 'variable' back into stage and udaj, aka create stage markers 
-# HERE
+# create markers for groups of groupings
+uu$exekutiva <- FALSE
+uu$exekutiva[uu$grouping=='UO - Ministerstva' | uu$grouping=='UO - Ostatní' | 
+               uu$grouping=='OSS-SS']  <- TRUE
+uu$UO <- FALSE
+uu$UO[uu$grouping=='UO - Ministerstva' | uu$grouping=='UO - Ostatní'] <- TRUE
 
-# add base value value
-uu <- uu[,c(4,1:3,5:7)]
-uu <- AddBaseValue(uu,'2003-01-01',c(2:7))
-
-# add lagged value - assuming 11 time periods
-#uu <- ddply(uu, .(KapNum, grouping, UdajStage),
-#            transform, valuelag = c(NA, value[-11]))
-
-# add deflator data
-uu <- AddDeflators(uu)
-
-# calculate nominal and real changes in pay as budgeted and as turned out
+# calculate real changes
 uu$realchange <- uu$perc_base/uu$Infl2003Base
 
-plot <- ggplot(uu[uu$variable=='AvgSal_skutecnost' & uu$grouping=='UO - Ministerstva',],
-               aes(x=Year,y=realchange)) +
-  geom_bar(stat='identity') +
+# Plots -------------------------------------------------------------------
+
+# simple composition in terms of additive categories of organisation
+uu2 <- uu[uu$groupingsum==F & uu$variable=='Zam_skutecnost' & uu$UO & uu$value!=0,]
+uu2 <- uu2[with(uu2, order(grouping)), ]
+uu2$value[uu2$value==0] <- NA
+plot <- ggplot(uu2,aes(y=value,x=Year,fill=grouping,group=grouping)) +
+  geom_bar(stat='identity',position='stack') +
+  facet_wrap(~KapAbb,scales='free_y')
+plot
+
+# real change in pay since 2003
+uu2 <- uu[uu$variable=='AvgSal_skutecnost' & uu$grouping=='UO - Ministerstva' & 
+            uu$Ministerstvo,]
+plot <- ggplot(uu2,aes(x=Year,y=realchange)) +
+  geom_line(size=1) +
+  scale_y_continuous(labels=percent) +
   facet_wrap(~KapAbb) + theme_classic()
 plot
 
-plot <- ggplot(uuw[uuw$Platy_skutecnost!=0 & uuw$Year=='2012-01-01',],
-               aes(x=grouping, fill=Zam_skutecnost)) +
-  geom_bar(stat='identity', aes(y=AvgSal_skutMinusupr)) +
-  scale_fill_continuous(low='yellow',high='red') +
+# differential between budgeted and actual salary, by layer and chapter in 2012
+uu2 <- uu[uu$Year=='2012-01-01' & uu$variable=='AvgSal_uprMinusskut' & !uu$groupingsum,]
+plot <- ggplot(uu2,aes(x=grouping, fill=grouping)) +
+  geom_bar(stat='identity', aes(y=-value)) +
   scale_y_continuous(limits=c(-2000,10000)) +
-  facet_wrap(~KapAbb) + theme_classic() + coord_flip()
+  facet_wrap(~KapAbb) + theme_igray() + coord_flip()
 plot
 
-plot <- ggplot(uuw[uuw$Platy_skutecnost!=0 & uuw$Year=='2012-01-01',],
-               aes(x=grouping, fill=Zam_skutecnost)) +
-  geom_bar(stat='identity', aes(y=Zam_upr2skut-1)) +
-  scale_fill_continuous(low='yellow',high='red') +
-  facet_wrap(~KapAbb) + theme_gray() + coord_flip()
+# same thing in percentage terms
+uu2 <- uu[uu$variable=='AvgSal_upr2skut' & uu$Year=='2012-01-01' & !uu$groupingsum,]
+plot <- ggplot(uu2,aes(x=grouping, fill=grouping)) +
+  geom_bar(stat='identity', aes(y=1-value)) +
+  scale_y_continuous(labels=percent) +
+  facet_wrap(~KapAbb) + coord_flip()
 plot
 
-uuw2 <- uuw[uuw$grouping!='StatniSprava' & uuw$grouping!='ROPO celkem' & 
-              uuw$grouping!='OSS-RO',]
-plot <- ggplot(uuw2,
-               aes(y=Zam_schvaleny,x=as.character(Year), fill=grouping)) +
-  geom_bar(stat='identity',position='stack') +
-  facet_wrap(~KapAbb,scales='free_y') + theme_gray()
+# composition of jobs gap
+uu2 <- uu[uu$variable=='Zam_uprMinusskut' & uu$groupingsum==F,]
+uu2 <- uu2[with(uu2, order(grouping)), ]
+plot <- ggplot(uu2,aes(x=Year, fill=grouping)) +
+  geom_bar(stat='identity', aes(y=value)) +
+  facet_wrap(~KapAbb, scales='free_y')
 plot
 
+# central body pay 
+uu2 <- uu[(uu$variable=='AvgSal_skutecnost' | uu$variable=='AvgSal_upraveny') &
+            uu$grouping=='UO',]
+plot <- ggplot(uu2,aes(x=Year, group='KapAbb', colour=variable)) +
+  geom_line() +
+  facet_wrap(~KapAbb, scales='free_y')
+plot

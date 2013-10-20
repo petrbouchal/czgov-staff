@@ -1,5 +1,6 @@
-AddBaseValue <- function (data, basetime,range=2:length(data)) {
-  basedata <- data[data$Year==basetime,range]
+AddBaseValue <- function (data, basetime) {
+  basedata <- data[data$Year==basetime,]
+  basedata$Year <- NULL
   basedata$value_base <- basedata$value
   basedata$value <- NULL
   datawithbase <- merge(data,basedata)
