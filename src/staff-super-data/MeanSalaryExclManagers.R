@@ -1,16 +1,16 @@
 source('./src/lib/lib_PubFinCZ.R')
 
 # Assumptions on top management salaries & staff numbers, estimating from LN data
-toppocet <- 344
-topplat <- 75000
+toppocet <- 150
+topplat <- 70000
 toppersonplat <- 344000
 
-onlyonedept <- FALSE
-ministerstvo <- 'MV'
+onlyonedept <- F
+ministerstvo <- 'ÚV'
 
-#ff0 <- LoadDataforPlotting('chapters')
-ff <- ff0
-ff <- ff[ff$Udaj=='Zam' & ff$Year=='2011-01-01' & ff$BudgetStage=='skutecnost' &
+# uu0 <- LoadDataforPlotting('chapters')
+ff <- uu0
+ff <- ff[ff$Udaj=='Zam' & ff$Year=='2011-01-01' & ff$BudgetStage=='rozpocet' &
            ff$Ministerstvo==TRUE & ff$sheetname=='UO',]
 pocetlidi <- sum(ff$value, na.rm=T)
 if(onlyonedept) {
@@ -19,7 +19,7 @@ if(onlyonedept) {
   pocetlidi <- sum(ff$value, na.rm=T)
 }
 
-ff <- ff0
+ff <- uu0
 ff <- ff[ff$Udaj=='Platy' & ff$Year=='2011-01-01' & ff$BudgetStage=='skutecnost' &
            ff$Ministerstvo==TRUE & ff$sheetname=='UO',]
 platysuma <- sum(ff$value, na.rm=T)

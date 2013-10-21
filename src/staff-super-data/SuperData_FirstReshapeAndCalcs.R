@@ -13,7 +13,10 @@ uu$Year <- as.Date(uu$Year)
 # turn into wide - expand groupings
 uu <- uu[uu$Udaj=='PlatyOPPP' | uu$Udaj=='Platy' | uu$Udaj=='OPPP' | uu$Udaj=='Zam',]
 uuw1 <- cast(uu,Udaj+BudgetStage+Year+KapAbb+KapNum+KapName+Ministerstvo~grouping)
-uuw1$StatniSpravabezSOBCPO <- uuw1$`St. sprava se SOBCPO`-uuw1$SOBCPO
+
+# create new groupings
+uuw1$StatniSpravabezSOBCPO <- ifelse(uuw1$SOBCPO==0, uuw1$`St. sprava se SOBCPO`, 
+                                     uuw1$`St. sprava se SOBCPO`-uuw1$SOBCPO)
 uuw1$UO <- psum(uuw1$`UO - Ministerstva`,uuw1$`UO - Ostatní`,na.rm=T)
 uuw1$Exekutiva <- psum(uuw1$UO,uuw1$`OSS-SS`,na.rm=T)
 

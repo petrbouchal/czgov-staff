@@ -24,7 +24,7 @@ theme_PB <- theme_few()+
         plot.background=element_rect(fill=NA,colour=NA),
         plot.margin=unit(c(.25,.25,0,0),'cm'),
         strip.background=element_rect(fill=NA,colour=NA),
-        plot.title=element_blank(),
+        plot.title=element_text(size=10,face='bold'),
         panel.grid=element_line(colour=themecols[1,3]),
         panel.grid.minor=element_blank(),
         panel.grid.major.x=element_blank(),

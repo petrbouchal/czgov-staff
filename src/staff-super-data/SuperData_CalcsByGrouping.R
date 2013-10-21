@@ -134,7 +134,7 @@ plot <- ggplot(hh2,aes(x=Year, y=value, group=variable)) +
   geom_line(size=1,data=hh2[hh2$grouping=='UO - Ministerstva',],
             aes(y=value/phasal_all,colour=variable)) +
   geom_line(size=1,data=hh2[hh2$grouping=='UO - Ministerstva',],
-            aes(y=(value-1120/Infl2003Base)/phasal_all,colour=variable),
+            aes(y=(value-500/Infl2013Base)/phasal_all,colour=variable),
             linetype='dashed') +
   facet_wrap(~grouping) + theme_classic()
 plot
