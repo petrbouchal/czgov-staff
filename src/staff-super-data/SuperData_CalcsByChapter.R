@@ -40,13 +40,13 @@ uu$UO[uu$grouping=='UO - Ministerstva' | uu$grouping=='UO - Ostatní' |
 uu$realchange <- uu$perc_base/uu$Infl2003Base
 
 # Plots -------------------------------------------------------------------
+uu <- uu[with(uu, order(grouping)), ]
 
 # simple composition in terms of additive categories of organisation
 title='Zaměstnanci kapitol podle typu organizace (rozpočty)'
 ylab='Počet zaměstnanců'
 xlab=''
 uu2 <- uu[uu$groupingsum==F & uu$variable=='Zam_schvaleny' & uu$value!=0,]
-uu2 <- uu2[with(uu2, order(grouping)), ]
 uu2$value[uu2$value==0] <- NA
 plot <- ggplot(uu2,aes(y=value,x=Year,fill=grouping,group=grouping)) +
   geom_bar(stat='identity',position='stack') +
@@ -147,4 +147,32 @@ plot <- ggplot(uu2,aes(x=Year, y=value, colour=variable)) +
   geom_line(size=1) +
   facet_wrap(~KapAbb, scales='free_y') +
   labs(title=title, x=xlab, y=ylab)
+plot
+
+# exekutiva body staff numbers 
+title='Počet zaměstnanců v ústředních orgánech státu: rozpočet a skutečnost'
+ylab='Počet zaměstnanců'
+xlab=''
+uu2 <- uu[(uu$variable=='Zam_skutecnost' | uu$variable=='Zam_upraveny') &
+            uu$grouping=='Exekutiva' & !is.na(uu$value) & uu$value!=0,]
+uu2$ggroup <- paste0(uu2$variable,'_',uu2$KapAbb)
+plot <- ggplot(uu2,aes(x=Year, y=value, colour=variable)) +
+  geom_line(size=1) +
+  facet_wrap(~KapAbb, scales='free_y') +
+  labs(title=title, x=xlab, y=ylab)
+plot
+
+# Exekutiva staff numbers 2012 by chapter 
+title='Počet zaměstnanců v exekutivě 2009 a 2012'
+ylab='Počet zaměstnanců'
+xlab=''
+uu2 <- uu[(uu$variable=='Zam_skutecnost') &
+            (uu$grouping=='Exekutiva') & 
+            !is.na(uu$value) & uu$value!=0 & (uu$Year=='2009-01-01' | uu$Year=='2012-01-01'),]
+uu2$KapAbb <- factor(uu2$KapAbb, levels=uu2$KapAbb[order(-uu2$value)], ordered=TRUE)
+plot <- ggplot(uu2,aes(x=Year, y=value, fill=Year)) +
+  geom_bar(stat='identity', position='dodge') +
+  facet_wrap(~KapAbb,nrow=2) +
+  labs(title=title, x=xlab, y=ylab) +
+  scale_x_date(breaks=as.Date(c('2009-01-01','2012-01-01')),labels=date_format('%Y'))
 plot
