@@ -1,0 +1,317 @@
+---
+output: html_document
+---
+``` {r cache=FALSE,include=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE, dev='cairo_pdf', warning=FALSE)
+```
+
+Charts based on data by grouping
+
+```{r Load and prep}
+setwd("~/github/local/PubFinCZ/")
+source('./src/lib/lib_PubFinCZ_light.R')
+source('./src/lib/')
+getwd()
+# load('./data-output/groups_ALL.RData')
+load('./data-output/groups_bezMVaMZV.RData')
+hh <- RelabelGroups(hh)
+```
+
+# Plots 
+
+# all people by grp over time - statni sprava bez SOBCPO/vsechny skupiny
+``` {r}
+title='Počet zaměstnanců 2003-2012: státní správa bez sborů, rozpočet a skutečnost'
+ylab='Počet zaměstnanců (x1000)'
+xlab=''
+hh2 <- hh[(hh$variable=='Zam_skutecnost') &
+            (!hh$sgrp) & !is.na(hh$value) &
+            hh$exekutiva &
+            hh$value!=0,]
+hh2 <- hh2[with(hh2, order(grp)), ]
+hh2$gg <- paste0(hh2$grp,'_',hh2$variable)
+plot <- ggplot(hh2,aes(x=Year, y=value/1000, fill=grp, group=gg)) +
+  geom_area(stat='identity',size=0, position='stack') +
+  labs(title=title, x=xlab, y=ylab) +
+  scale_x_date(labels=date_format('%Y'))
+plot
+```
+
+# Change in staff numbers by grp over time
+``` {r}
+title='Změna počtu zaměstnanců pod regulací rozpočtu 2003-2012'
+ylab='Změna počtu zaměstnanců (2003 = 100%)'
+xlab=''
+hh2 <- hh[(hh$variable=='Zam_skutecnost') &
+            (!hh$sgrp) & !is.na(hh$value) &
+            hh$value!=0,]
+plot <- ggplot(hh2,aes(x=Year, y=perc_base-1, colour=grp)) +
+  geom_line(size=1.5) +
+  scale_y_continuous(labels=percent) +
+  labs(title=NULL, x=xlab, y=ylab) +
+  scale_colour_manual(values=idcols_ordered) +
+  scale_x_date(labels=date_format('%Y'))
+plot
+```
+
+``` {r}
+# change in nominal paybill by grp over time
+title='Změna výdajů na platy 2003-2012'
+ylab='2003 = 100% (změna výdajů na platy)'
+xlab=''
+hh2 <- hh[(hh$variable=='Platy_schvaleny') &
+            (hh$sgrp) & !is.na(hh$value) &
+#            hh$exekutiva &
+            hh$value!=0,]
+plot <- ggplot(hh2,aes(x=Year, y=perc_base, colour=grp)) +
+  geom_line(size=1) +
+  scale_y_continuous(labels=percent) +
+  labs(title=title, x=xlab, y=ylab) +
+  scale_colour_manual(values=idcols_ordered) +
+  scale_x_date(labels=date_format('%Y'))
+plot
+```
+
+
+``` {r}
+# change in real paybill by grp over time
+title='Změna výdajů na platy 2003-2012'
+ylab='2003 = 100% (reálná změna výdajů na platy)'
+xlab=''
+hh2 <- hh[(hh$variable=='Platy_schvaleny') &
+            (!hh$sgrp) & !is.na(hh$value) &
+#            hh$exekutiva &
+            hh$value!=0,]
+plot <- ggplot(hh2,aes(x=Year, y=perc_base/Infl2003Base, colour=grp)) +
+  geom_line(size=1) +
+  scale_y_continuous(labels=percent) +
+  labs(title=NULL, x=xlab, y=ylab) +
+  scale_colour_manual(values=idcols_ordered) +
+  scale_x_date(labels=date_format('%Y'))
+plot
+```
+
+``` {r}
+
+# % changes to nominal average salary by grp
+title='Plat ve státní správě jako podíl průměrného platu, podle typu organizace od roku 2003: rozpočet a skutečnost\n'
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[hh$sgrp==FALSE & hh$Year!='2013-01-01' & hh$variable=='AvgSal_skutecnost',]
+plot <- ggplot(hh2,aes(Year, perc_base-1, colour=grp, group=grp)) +
+  geom_line(size=1) +
+  scale_y_continuous(labels=percent) + 
+  scale_colour_manual(values=idcols_ordered) +
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+# % real changes to avg salary by grp
+``` {r}
+title='Změna průměrných platů očištěná o inflaci, 2003-2013 (rozpočet)'
+ylab='Změna očištěná o inflaci'
+xlab=''
+hh2 <- hh[hh$sgrp & hh$variable=='AvgSal_schvaleny',]
+hh2 <- RelabelGroups(hh2)
+plot <- ggplot(hh2, aes(Year, realchange-1, colour=grp, group=grp)) +
+  geom_line(size=1.5) +
+  scale_y_continuous(labels=percent) + 
+#   scale_colour_manual(values=idcols_ordered) +
+  labs(title=NULL, x=xlab, y=ylab)
+plot
+```
+
+# paybill adjusted for inflation by grp, outturn
+# if generating this graph, make sure nothing has been excluded (MV, MZV)
+``` {r}
+title='Plat ve státní správě jako podíl průměrného platu, podle typu organizace od roku 2003: rozpočet a skutečnost\n'
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[hh$sgrp==FALSE & hh$Year!='2013-01-01' & hh$variable=='Platy_skutecnost',]
+plot <- ggplot(hh2,aes(Year, value/Infl2003Base, fill=grp, group=grp)) +
+  geom_area(stat='identity',position='stack') +
+  scale_y_continuous(labels=comma) + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+# staff numbers by grp, as budgeted
+``` {r}
+title='Počet zaměstnanců podle skupiny organizací, 2003-12 (skutečnost)'
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[hh$sgrp==FALSE & hh$Year!='2013-01-01',]
+hh2 <- hh2[with(hh2, order(grp)), ]
+plot <- ggplot(hh2[hh2$variable=='Zam_upraveny',],
+               aes(Year, value, fill=grp, group=grp)) +
+  geom_area(stat='identity',position='stack') +
+  scale_y_continuous(labels=comma) + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+# staff gap by grp (%)
+title='Rozdíl v počtu zaměstnanců mezi rozpočtem a skutečností, 2003-12'
+ylab='% rozdíl'
+xlab=''
+hh2 <- hh[hh$sgrp & (hh$Year!='2013-01-01' & hh$variable=='Zam_upr2skut'),]
+hh2 <- hh2[with(hh2, order(grp)), ]
+plot <- ggplot(hh2, aes(Year, -(value-1), fill=grp, group=grp)) +
+  geom_bar(stat='identity',position='dodge') +
+  scale_y_continuous(labels=percent) + facet_wrap(~grp) + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+# paybill over/underspend by grp (%)
+title='Rozdíl v počtu zaměstnanců mezi rozpočtem a skutečností, 2003-12'
+ylab='% rozdíl'
+xlab=''
+hh2 <- hh[!hh$sgrp & (hh$Year!='2013-01-01' & hh$variable=='Platy_upr2skut'),]
+hh2 <- hh2[with(hh2, order(grp)), ]
+plot <- ggplot(hh2, aes(Year, -(value-1), fill=grp, group=grp)) +
+  geom_bar(stat='identity',position='dodge') +
+  scale_y_continuous(labels=percent) + facet_wrap(~grp) + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+
+``` {r}
+# staff gap by grp, abs
+title='Rozdíl v počtu zaměstnanců mezi rozpočtem a skutečností, 2003-12
+(upravený rozpočet vs. skutečnost)'
+ylab='rozdíl'
+xlab=''
+hh2 <- hh[hh$sgrp & (hh$Year!='2013-01-01' & hh$variable=='Zam_uprMinusskut'),]
+hh2 <- hh2[with(hh2, order(grp)), ]
+plot <- ggplot(hh2, aes(Year, -value, fill=grp, group=grp)) +
+  geom_bar(stat='identity',position='dodge') +
+  scale_y_continuous(labels=comma) + facet_wrap(~grp) + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+# salary 'raise' budgeting effect, by grp
+title='Rozdíl mezi rozpočtovaným a skutečným platem
+(upravený rozpočet vs. skutečnost)'
+ylab='rozdíl měsíčního platu (Kč)'
+xlab=''
+hh2 <- hh[hh$variable=='AvgSal_uprMinusskut' & hh$sgrp,]
+plot <- ggplot(hh2, aes(x=Year, y=-value, fill=grp)) +
+  geom_bar(stat='identity') +
+  facet_wrap(~grp) + 
+#   scale_fill_manual(values=idcols_ordered) +
+  labs(title=NULL, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+# salary 'raise' budgeting effect in %, by grp
+title='Rozdíl mezi rozpočtovaným a skutečným platem
+(upravený rozpočet vs. skutečnost)'
+ylab='rozdíl měsíčního platu (Kč)'
+xlab=''
+hh2 <- hh[hh$variable=='AvgSal_upr2skut' & !hh$sgrp,]
+plot <- ggplot(hh2, aes(x=Year, y=-(value-1), fill=grp)) +
+  geom_bar(stat='identity') +
+  scale_y_continuous(label=percent) +
+  facet_wrap(~grp) + 
+  scale_fill_manual(values=idcols_ordered) +
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+title='Reálné změny platů 2003-2013, rozpočet a skutečnost'
+ylab='% BLAH'
+xlab=''
+hh2 <- hh[(hh$variable=='AvgSal_skutecnost' | hh$variable=='AvgSal_schvaleny') & !hh$sgrp,]
+hh2$grpvar <- paste0(hh2$grp,hh2$variable)
+plot <- ggplot(hh2,aes(x=Year, y=perc_base/Infl2003Base,group=grpvar)) +
+  geom_line(size=1,aes(colour=variable)) +
+  scale_y_continuous(labels=percent) +
+  facet_wrap(~grp) +
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+```{r}
+# average salary as budgeted, as % of national average salary
+title='Plat ve státní správě ve vztahu k průměrnému platu v ČR/Praze,
+podle typu organizace, 2003-2013 (schválený rozpočet)' 
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[(hh$variable=='AvgSal_skutecnost') & !hh$sgrp & !is.na(hh$value),]
+hh2$czavgsal <- hh2$czsal_all
+hh2$czavgsal[hh2$UO] <- hh2$phasal_all[hh2$UO]
+hh2$grp2 <- paste0(hh2$grp,hh2$variable)
+plot <- ggplot(hh2,aes(x=Year, y=value/czavgsal-1,
+                       group=grp2)) +
+  geom_hline(y=0,size=2,col='grey') +
+  geom_line(size=1.5,aes(colour=grp)) +
+  scale_y_continuous(labels=percent) + 
+  scale_colour_manual(values=idcols_ordered) +
+  labs(title=NULL, x=xlab, y=ylab) + theme(axis.line=element_line())
+plot
+```
+
+``` {r}
+# average salary, as budgeted and turnout, real change from 2003
+#in this one the adjustment for top managers is incorrectly deflated
+title='Plat ve státní správě jako podíl průměrného platu, podle typu organizace od roku 2003: rozpočet a skutečnost\n'
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[hh$variable=='AvgSal_skutecnost' | hh$variable=='AvgSal_upraveny',]
+plot <- ggplot(hh2,
+               aes(x=Year, y=value, group=variable)) +
+  geom_line(size=1, aes(y=(value-1120)/(value_base-1120)/Infl2003Base,colour=variable)) +
+  geom_line(size=1, aes(y=czsal_all/czsal_all_2003/Infl2003Base),colour='yellow') +
+  geom_line(data=hh2[hh2$grp=='Ministerstva',],size=1,
+            aes(y=phasal_all/phasal_all_2003/Infl2003Base,),colour='black') +
+  facet_wrap(~grp) + theme_classic() + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+# average salary, as budgeted and turnout, real change from 2003
+#in this one the adjustment for top managers is incorrectly deflated
+title='Plat ve státní správě jako podíl průměrného platu, podle typu organizace od roku 2003: rozpočet a skutečnost\n'
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[hh$variable=='AvgSal_skutecnost' | hh$variable=='AvgSal_upraveny',]
+plot <- ggplot(hh2,
+               aes(x=Year, y=value, group=variable)) +
+  geom_line(size=1, aes(y=(value-1120)/(value_base-1120)/Infl2003Base,colour=variable)) +
+  geom_line(size=1, aes(y=czsal_all/czsal_all_2003/Infl2003Base),colour='yellow') +
+  geom_line(data=hh2[hh2$grp=='Ministerstva',],size=1,
+            aes(y=phasal_all/phasal_all_2003/Infl2003Base,),colour='black') +
+  facet_wrap(~grp) + theme_classic() + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```
+
+``` {r}
+#in this one the adjustment for top managers is incorrectly deflated
+title='Rozdíl mezi , podle typu organizace od roku 2003: rozpočet a skutečnost\n'
+ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
+xlab=''
+hh2 <- hh[hh$variable=='AvgSal_skutecnost' | hh$variable=='AvgSal_upraveny',]
+plot <- ggplot(hh2,aes(x=Year, y=value, group=variable)) +
+  geom_line(size=1,data=hh2[hh2$grp!='Ministerstva',],
+            aes(y=value/czsal_all-1,colour=variable)) +
+  geom_line(size=1,data=hh2[hh2$grp=='Ministerstva',],
+            aes(y=value/phasal_all-1,colour=variable)) +
+  geom_line(size=1,data=hh2[hh2$grp=='Ministerstva',],
+            aes(y=(value-500/Infl2013Base)/phasal_all-1,colour=variable),
+            linetype='dashed') +
+  scale_y_continuous(labels=percent) +
+  facet_wrap(~grp) + 
+  labs(title=title, x=xlab, y=ylab)
+plot
+```

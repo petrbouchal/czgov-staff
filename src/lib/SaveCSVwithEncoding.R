@@ -1,6 +1,8 @@
-SaveCSVwithEncoding <- function (data, encoding='WINDOWS-1252') {
+SaveCSVwithEncoding <- function (data, path, encoding='WINDOWS-1252') {
   dataenc <- data
   iconvlist()
-  datacz$KapName <- iconv(dataenc$KapName,to=encoding)
-  write.csv(dataenc,file='./data-output/SuperData-encoded.csv')
+  sapply( df, function(x) if("factor" %in% class(x) | "character" %in% class(x))  {
+    iconv(x, to=encoding) } else {x})
+  write.csv(dataenc,file=path,row.names=FALSE,fileEncoding=encoding)
+  write.csv(dataenc,file=path,row.names=FALSE)
 }

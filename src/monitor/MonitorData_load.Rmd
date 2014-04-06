@@ -1,0 +1,106 @@
+Title
+========================================================
+```{r}
+source("./src/lib/lib_PubFinCZ_light.R")
+```
+
+```{r Load data}
+datapath <- '/Users/petrbouchal/Downloads/Pokladna/'
+keypath <- '/Users/petrbouchal/Downloads/Pokladna/Frontend/Vykazy/'
+periods <- c('2012_12','2011_12','2010_12','2013_06','2013_09')
+
+periodcounter <- 0
+for(period in periods) {
+  thisperiodfile <- paste0(datapath,period,"/",period,"_Data_CSUIS_FINU/FINU101.csv")
+  thisperioddata <- read.csv(thisperiodfile,sep=';',colClasses='character')
+  if(periodcounter<1) {
+    alldata0 <- thisperioddata}
+  else {
+    alldata0 <- rbind(alldata0,thisperioddata)
+  }
+  periodcounter <- periodcounter + 1
+}
+thisperioddata <- parakey <- orgkey <- itemkey <- NULL # clean up
+```
+
+``` {r Enrich data}
+alldata <- alldata0
+alldata$OrgICO <- ifelse(nchar(alldata$ZC_ICO.ZC_ICO)==10,
+                         substr(alldata$ZC_ICO.ZC_ICO,3,nchar(alldata$ZC_ICO.ZC_ICO)),
+                         alldata$ZC_ICO.ZC_ICO)
+
+alldata$ItemCode <- alldata$ZCMMT_ITM.ZCMMT_ITM
+alldata$ParaCode <- alldata$X0FUNC_AREA.0FUNC_AREA
+
+orgkeypath <- paste0(keypath,'kody_organizace_vykazy.csv')
+itemkeypath <- paste0(keypath,'kody_polozek_vykazy.csv')
+parakeypath <- paste0(keypath,'kody_paragrafy_vykazy.csv')
+orgkey <- read.csv(orgkeypath,colClasses='character')
+parakey <- read.csv(parakeypath,colClasses='character')
+itemkey <- read.csv(itemkeypath,colClasses='character')
+alldata <- merge(alldata,orgkey,all.x=T,all.y=F)
+alldata <- merge(alldata,parakey,all.x=T)
+alldata <- merge(alldata,itemkey,all.x=T)
+
+table(is.na(alldata$OrgName))
+table(is.na(alldata$ItemName))
+table(is.na(alldata$ParaName))
+# View(alldata0[is.na(alldata0$OrgName),])
+```
+
+``` {r Clean data}
+
+spdata <- alldata
+
+# Mark whether each budget/outturn column contains '-' at the end
+spdata$minus.konecny <- FALSE
+spdata$minus.schvaleny <- FALSE
+spdata$minus.pozmenach <- FALSE
+spdata$minus.skutecnost <- FALSE
+
+spdata$minus.konecny <- ifelse(str_detect(spdata$ZU_KROZP.ZU_KROZP,'-'),TRUE,FALSE)
+spdata$minus.schvaleny <- ifelse(str_detect(spdata$ZU_ROZSCH.ZU_ROZSCH,'-'),TRUE,FALSE)
+spdata$minus.pozmenach <- ifelse(str_detect(spdata$ZU_ROZPZM.ZU_ROZPZM,'-'),TRUE,FALSE)
+spdata$minus.skutecnost <- ifelse(str_detect(spdata$ZU_ROZKZ.ZU_ROZKZ,'-'),TRUE,FALSE)
+table(spdata$minus.konecny)
+table(spdata$minus.schvaleny)
+table(spdata$minus.skutecnost)
+table(spdata$minus.pozmenach)
+
+# View(spdata[spdata$minus.skutecnost,])
+
+# transform numbers with minuses into negative numbers - still all in character form
+spdata$RozpSchvaleny <- ifelse(spdata$minus.schvaleny,
+                             paste0('-',sub('-','',spdata$ZU_ROZSCH.ZU_ROZSCH,fixed=T)),
+                             spdata$ZU_ROZSCH.ZU_ROZSCH)
+spdata$RozpPozmenach <- ifelse(spdata$minus.pozmenach,
+                             paste0('-',sub('-','',spdata$ZU_ROZPZM.ZU_ROZPZM,fixed=T)),
+                             spdata$ZU_ROZPZM.ZU_ROZPZM)
+spdata$RozpKonecny <- ifelse(spdata$minus.konecny,
+                             paste0('-',sub('-','',spdata$ZU_KROZP.ZU_KROZP,fixed=T)),
+                             spdata$ZU_KROZP.ZU_KROZP)
+spdata$RozpSkutecnost <- ifelse(spdata$minus.skutecnost,
+                             paste0('-',sub('-','',spdata$ZU_ROZKZ.ZU_ROZKZ,fixed=T)),
+                             spdata$ZU_ROZKZ.ZU_ROZKZ)
+
+# turn the character strings into numbers
+spdata$RozpKonecny <- as.numeric(str_trim(spdata$RozpKonecny))
+spdata$RozpSchvaleny <- as.numeric(str_trim(spdata$RozpSchvaleny))
+spdata$RozpPozmenach <- as.numeric(str_trim(spdata$RozpPozmenach))
+spdata$RozpSkutecnost <- as.numeric(str_trim(spdata$RozpSkutecnost))
+View(spdata[spdata$minus.skutecnost,])
+                             
+```
+
+
+```{r Save data}
+# remove unnecessary columns
+spdata[,c("minus.skutecnost","minus.schvaleny",
+          "minus.pozmenach","minus.konecny")] <- list(NULL)
+
+options(scipen=20) # change scientific notation for writing CSV
+write.csv(spdata, '~/Downloads/Pokladna/alldata.csv', row.names=F)
+# SaveCSVwithEncoding(spdata, '~/Downloads/Pokladna/alldata.csv','WINDOWS-1252')
+options(scipen=6)
+```
+
