@@ -11,21 +11,24 @@ load('./data-output/chapters_ALL.Rdata')
 uu <- uu[with(uu,order(uu$grp)),]
 ```
 
-``` {r Order}
+``` {r Order and enrich}
 uu <- RelabelGroups(uu)
-uu$KapAbb <- factor(uu$KapAbb, levels=uu$KapAbb[order(-uu$value)], ordered=TRUE)
-uu$grp <- factor(uu$grp, levels=uu$grp[order(uu$grp)], ordered=TRUE)
+uu$grp <- factor(uu$grp, levels=levels(uu$grp[c(1,2,4,8,7,6,5,12,3,9,11,10)]))
+groupcolours <- read.csv('./data-input/groupcolours.csv')
+uu <- merge(uu,groupcolours,all.x=T)
+origdata <- uu
 ```
 
 # simple composition in terms of additive categories of organisation
 ``` {r plots}
 title='Zaměstnanci kapitol podle typu organizace (rozpočty)'
 title <- ''
-ylab='Počet zaměstnanců'
+ylab='Počet zaměstnanců v tisících'
 xlab=''
 uu2 <- uu[uu$sgrp==F & uu$variable=='Zam_schvaleny' & uu$value!=0,]
 uu2$value[uu2$value==0] <- NA
-plot_ChGrYr <- ggplot(uu2,aes(y=value,x=Year,fill=grp,group=grp)) +
+plot_ChGrYr <- ggplot(uu2,aes(y=value,x=Year,fill=grp,group=grp),
+                      aes_string(colour=grpcolour)) +
   geom_bar(stat='identity',position='stack') +
   scale_y_continuous(labels=comma) +
   scale_fill_manual(values=idcols_ordered) +
@@ -65,7 +68,6 @@ plot
 ```
 
 # real change in pay since base year
-
 ``` {r}
 title='Změna průměrné hrubé mzdy očistěná o inflaci\nMinisterstva, skutečný stav, 2003=100%'
 ylab='% změna od 2003, očištěno o inflaci'
@@ -176,9 +178,8 @@ plot <- ggplot(uu2,aes(x=Year, y=value/1000, colour=variable)) +
 plot
 ```
 
-
-``` {r}
 # central body staff numbers over time
+``` {r}
 title='Počet zaměstnanců v ústředních orgánech státu: rozpočet a skutečnost'
 ylab='Počet zaměstnanců'
 xlab=''
@@ -210,6 +211,8 @@ plot
 
 # exekutiva body staff numbers 
 ``` {r}
+uu <- origdata
+
 title='Počet zaměstnanců v ústředních orgánech státu: rozpočet a skutečnost'
 ylab='Počet zaměstnanců'
 xlab=''
@@ -219,20 +222,24 @@ uu2$ggroup <- paste0(uu2$variable,'_',uu2$KapAbb)
 plot <- ggplot(uu2,aes(x=Year, y=value, colour=variable)) +
   geom_line(size=1) +
   facet_wrap(~KapAbb, scales='free_y') +
-  labs(title=title, x=xlab, y=ylab)
+  labs(title=NULL, x=NULL, y=NULL)
 plot
 ```
 
-
 # Exekutiva staff numbers 2009 & 2012 by chapter 
 ``` {r}
+uu <- origdata
 title='Počet zaměstnanců v exekutivě 2009 a 2012'
 ylab='Počet zaměstnanců'
 xlab=''
-uu2 <- uu[(uu$variable=='Zam_skutecnost') &
-            (uu$grp=='Exekutiva') & 
-            !is.na(uu$value) & uu$value!=0 & (uu$Year=='2009-01-01' | uu$Year=='2012-01-01'),]
+
+yearstoinclude <- as.Date(c('2009-01-01','2012-01-01'))
+uu2 <- filter(uu,variable=='Zam_skutecnost' & grp=='Státní správa' & !is.na(value)) %.%
+  filter(value!=0) %.%
+  filter(Year %in% yearstoinclude)
+
 uu2$KapAbb <- factor(uu2$KapAbb, levels=uu2$KapAbb[order(-uu2$value)], ordered=TRUE)
+
 plot <- ggplot(uu2,aes(x=Year, y=value, fill=Year)) +
   geom_bar(stat='identity', position='dodge') +
   facet_wrap(~KapAbb,nrow=2) +
@@ -241,43 +248,61 @@ plot <- ggplot(uu2,aes(x=Year, y=value, fill=Year)) +
 plot
 ```
 
-
 # Exekutiva staff numbers 2012 by chapter and grp
 ``` {r}
+uu <- origdata
 title='Počet zaměstnanců v roce 2012: státní správa bez bezpečnostních sborů'
 ylab='Počet zaměstnanců (x1000)'
 xlab=''
-uu2 <- uu[(uu$variable=='Zam_skutecnost') &
-#            (uu$grp=='Exekutiva') & 
-            (uu$grp=='UO - Ministerstva' | uu$grp=='UO - Ostatní' |
-               uu$grp=='OSS-SS') &
-            !is.na(uu$value) & uu$value!=0 & (uu$Year=='2012-01-01'),]
+
+grpstoinclude <- c('Ostatní ústřední','Ministerstva','Neústřední st. správa')
+uu2 <- filter(uu, variable=='Zam_skutecnost') %.%
+  filter((grp %in% grpstoinclude) & !is.na(value) & Year=='2012-01-01') %.%
+  group_by(KapAbb) %.%
+  mutate(chaptertotal = sum(value))
+  
 uu2$grp <- droplevels(uu2$grp)
-uu2$KapAbb <- factor(uu2$KapAbb, levels=uu2$KapAbb[order(-uu2$value)], ordered=TRUE)
-plot <- ggplot(uu2,aes(x=KapAbb, y=value/1000, fill=grp)) +
+uu2$KapAbb <- factor(uu2$KapAbb,
+                     levels=uu2$KapAbb[order(-uu2$chaptertotal)], ordered=TRUE)
+
+plot <- ggplot(uu2,aes(x=KapAbb, y=value/1000, fill=grpcolour)) +
   geom_bar(stat='identity', position='stack') +
-  scale_y_continuous()+
-  labs(title=title, x=xlab, y=ylab) +
+  scale_y_continuous() +
+  scale_fill_identity(breaks=uu2$grpcolour,guide='legend',labels=uu2$grp) +
+  labs(title=NULL, x=NULL, y=NULL) +
   theme(axis.text.x=element_text(angle=90,hjust=1,size=10,face='bold'),
         axis.ticks.x=element_blank())
 plot
+SavePlot(plotname = 'Exek_2012_chapter_grp','png',ploth = 12,plotw = 15)
 ```
 
 # All staff numbers 2012 by chapter and grp
 ``` {r Staff# 2012}
+uu <- origdata
 title='Počet zaměstnanců v roce 2012 podle kapitol:
 všichni zaměstnanci pod rozpočtovou regulací'
 ylab='Počet zaměstnanců (x1000)'
 xlab=''
-uu2 <- uu[(uu$variable=='Zam_skutecnost') & !uu$sgrp &
-            !is.na(uu$value) & uu$value!=0 & (uu$Year=='2012-01-01'),]
+
+uu2 <- filter(uu, variable=='Zam_skutecnost') %.%
+  filter(!is.na(value) & Year=='2012-01-01' & !sgrp) %.%
+  group_by(KapAbb) %.%
+  mutate(chaptertotal = sum(value))
+  
 uu2$grp <- droplevels(uu2$grp)
-uu2$KapAbb <- factor(uu2$KapAbb, levels=uu2$KapAbb[order(-uu2$value)], ordered=TRUE)
-plot <- ggplot(uu2,aes(x=KapAbb, y=value/1000, fill=grp)) +
+
+uu2$grp <- droplevels(uu2$grp)
+uu2$KapAbb <- factor(uu2$KapAbb, levels=uu2$KapAbb[order(-uu2$chaptertotal)], ordered=TRUE)
+
+plot <- ggplot(uu2,aes(x=KapAbb, y=value/1000, fill=grpcolour)) +
   geom_bar(stat='identity', position='stack') +
-  scale_y_continuous()+
-  labs(title=title, x=xlab, y=ylab) +
+  scale_y_continuous() +
+  scale_fill_identity(breaks=uu2$grpcolour,guide='legend',labels=uu2$grp) +
+  labs(title=NULL, x=NULL, y=NULL) +
+  guides(fill = guide_legend(nrow = 2,byrow=T)) +
   theme(axis.text.x=element_text(angle=90,hjust=1,size=10,face='bold'),
-        axis.ticks.x=element_blank()) + coord_flip()
+        axis.ticks.x=element_blank())
+
 plot
+SavePlot(plotname = 'All_2012_chapter_grp','png',ploth = 12,plotw = 15)
 ```

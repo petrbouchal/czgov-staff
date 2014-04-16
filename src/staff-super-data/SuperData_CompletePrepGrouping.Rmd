@@ -5,6 +5,7 @@ uu0 <- LoadDataforPlotting('chapters')
 uu <- uu0
 
 # MV & MZV cause distortions (2011-12 reclass's) - exclude?
+
 excludeMVaMZV <- FALSE
 
 uu$todiscard <- FALSE
@@ -21,6 +22,7 @@ source('./src/staff-super-data/SuperData_FirstReshapeAndCalcs.R')
 hh <- ddply(uu,.(Year,grp,sgrp,Udaj,BudgetStage), summarise,
             value=sum(value, na.rm=T),
             .progress = "text")
+
 ```
 
 ```{r Calculate indices and changes between budget stages}
@@ -39,7 +41,7 @@ hhw2 <- CalcAvgsAndIndices(hhw2)
 hhw2 <- as.data.frame(hhw2)
 hh <- melt(hhw2, id.vars=c('Year','grp','sgrp'))
 
-hh <- AddBaseValue(hh,'2003-01-01')
+hh <- AddBaseValue(hh,basetime = '2003-01-01')
 hh <- AddEconIndicators(hh)
 hh$realchange <- hh$perc_base/hh$Infl2003Base
 ```

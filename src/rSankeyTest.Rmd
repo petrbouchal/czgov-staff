@@ -1,0 +1,44 @@
+---
+title: "SankeyPlots"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+require(googleVis)
+rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
+colnames(rozp) <- c('source','target','value')
+plot (
+  gvisSankey(from = 'source',to = 'target', weight = 'value', data = rozp,
+             options = list(width=800))
+  )
+
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+library(rCharts)
+rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
+colnames(rozp) <- c('source','target','value')
+sankeyPlot <- rCharts$new()
+sankeyPlot$setLib('./src/rCharts_d3_sankey-gh-pages/')
+sankeyPlot$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart.html")
+
+sankeyPlot$set(
+  data = rozp,
+  nodeWidth = 5,
+  nodePadding = 10,
+  layout = 99,
+  width = 750,
+  height = 500
+)
+ 
+sankeyPlot
+sankeyPlot$print('blah', include_assets = TRUE, cdn=TRUE)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
