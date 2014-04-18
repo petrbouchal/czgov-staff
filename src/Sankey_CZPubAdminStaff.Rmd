@@ -7,10 +7,9 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r}
+```{r Sankey Google Charts}
 require(googleVis)
 rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
-colnames(rozp) <- c('source','target','value')
 plot (
   gvisSankey(from = 'source',to = 'target', weight = 'value', data = rozp,
              options = list(width=800))
@@ -18,17 +17,16 @@ plot (
 
 ```
 
-You can also embed plots, for example:
 
-```{r, echo=FALSE}
+```{r rChart Sankey Verejny sektor}
 library(rCharts)
-rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
+rozp <- read.csv('./data-input/VerejnySektor.csv')
 colnames(rozp) <- c('source','target','value')
-sankeyPlot <- rCharts$new()
-sankeyPlot$setLib('./src/rCharts_d3_sankey-gh-pages/')
-sankeyPlot$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart.html")
+sankeyPlotVS <- rCharts$new()
+sankeyPlotVS$setLib('./src/rCharts_d3_sankey-gh-pages/')
+sankeyPlotVS$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart.html")
 
-sankeyPlot$set(
+sankeyPlotVS$set(
   data = rozp,
   nodeWidth = 5,
   nodePadding = 10,
@@ -37,8 +35,29 @@ sankeyPlot$set(
   height = 500
 )
  
-sankeyPlot
-sankeyPlot$print('blah', include_assets = TRUE, cdn=TRUE)
+sankeyPlotVS
+sankeyPlotVS$print('blah', include_assets = TRUE, cdn=TRUE)
+```
+
+```{r rChart Sankey Rozpocet}
+library(rCharts)
+rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
+colnames(rozp) <- c('source','target','value')
+sankeyPlotR <- rCharts$new()
+sankeyPlotR$setLib('./src/rCharts_d3_sankey-gh-pages/')
+sankeyPlotR$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart.html")
+
+sankeyPlotR$set(
+  data = rozp,
+  nodeWidth = 5,
+  nodePadding = 10,
+  layout = 99,
+  width = 750,
+  height = 500
+)
+ 
+sankeyPlotR
+sankeyPlotR$print('blah', include_assets = TRUE, cdn=TRUE)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
