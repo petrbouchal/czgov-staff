@@ -76,7 +76,7 @@ ylab='Změna počtu zaměstnanců'
 xlab=''
 hh <- origdata
 hh2 <- hh[(hh$variable=='Zam_skutecnost') &
-            (hh$maxgrpset) & !is.na(hh$value) &
+            (hh$mingrpset) & !is.na(hh$value) &
             hh$value!=0,]
 plot <- ggplot(hh2,aes(x=Year, y=perc_base-1, colour=grpcolour)) +
   geom_line(size=1.5) +
@@ -85,12 +85,12 @@ plot <- ggplot(hh2,aes(x=Year, y=perc_base-1, colour=grpcolour)) +
   scale_colour_identity(breaks=hh2$grpcolour,labels=hh2$grp,guide='legend') +
   guides(colour=guide_legend(nrow=2,byrow=T)) +
   scale_x_date(breaks=yearbreaks42003_2012,labels=date_format('%Y'),
-               limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
+               limits = c(as.Date("2003-01-01"), as.Date('2012-01-01')))
 plot
-SavePlot(plotname = 'Change_2013-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
+SavePlot(plotname = 'Change_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
-# Change in staff numbers by grp over time
+# Change in nominal pay bill by grp over time
 ``` {r Change in paybill by grp over time}
 
 title='Změna výdajů na platy 2003-2012'
@@ -99,18 +99,19 @@ xlab=''
 
 hh <- origdata
 hh2 <- hh[(hh$variable=='Platy_schvaleny') &
-            (hh$maxgrp) & !is.na(hh$value) &
+            (hh$mingrp) & !is.na(hh$value) &
             hh$value!=0,]
 plot <- ggplot(hh2,aes(x=Year, y=perc_base-1, colour=grpcolour)) +
   geom_line(size=1.5) +
   scale_y_continuous(labels=percent) +
-  labs(title=title, x=xlab, y=ylab) +
+  labs(title=NULL, x=NULL, y=NULL) +
   scale_x_date(breaks=yearbreaks42003_2012,labels=date_format('%Y'),
                limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
   scale_colour_identity(breaks=hh2$grpcolour,labels=hh2$grp,guide='legend') +
   guides(colour=guide_legend(nrow=2,byrow=T))
-
 plot
+
+SavePlot(plotname = 'ChangePaybillNom_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
 
@@ -120,7 +121,7 @@ title='Změna výdajů na platy 2003-2012'
 ylab='2003 = 100% (reálná změna výdajů na platy)'
 xlab=''
 hh2 <- hh[(hh$variable=='Platy_schvaleny') &
-            (!hh$sgrp) & !is.na(hh$value) &
+            (hh$mingrpset) & !is.na(hh$value) &
 #            hh$exekutiva &
             hh$value!=0,]
 plot <- ggplot(hh2,aes(x=Year, y=perc_base/Infl2003Base-1, colour=grpcolour)) +
@@ -130,7 +131,8 @@ plot <- ggplot(hh2,aes(x=Year, y=perc_base/Infl2003Base-1, colour=grpcolour)) +
   guides(colour=guide_legend(nrow=2,byrow=T)) +
   scale_x_date(breaks=yearbreaks42003_2012,labels=date_format('%Y'),
                limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
-  labs(title=NULL, x=NULL, y=NULL) +
+  labs(title=NULL, x=NULL, y=NULL)
+SavePlot(plotname = 'ChangePaybillReal_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 plot
 ```
 
@@ -139,7 +141,7 @@ plot
 title='XXX'
 ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
 xlab=''
-hh2 <- hh[hh$sgrp==FALSE & hh$Year!='2013-01-01' & hh$variable=='AvgSal_skutecnost',]
+hh2 <- hh[hh$mingrp & hh$Year!='2013-01-01' & hh$variable=='AvgSal_skutecnost',]
 plot <- ggplot(hh2,aes(Year, perc_base-1, colour=grpcolour, group=grp)) +
   geom_line(size=1.5) +
   scale_y_continuous(labels=percent) + 
@@ -149,6 +151,7 @@ plot <- ggplot(hh2,aes(Year, perc_base-1, colour=grpcolour, group=grp)) +
   guides(colour=guide_legend(nrow=2,byrow=T)) +
   labs(title=NULL, x=NULL, y=NULL)
 plot
+SavePlot(plotname = 'ChangeSalNom_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
 # % real changes to avg salary by grp
@@ -157,7 +160,7 @@ hh <- origdata
 title='Změna průměrných platů očištěná o inflaci, 2003-2013 (rozpočet)'
 ylab='Změna očištěná o inflaci'
 xlab=''
-hh2 <- hh[hh$maxgrpset & hh$variable=='AvgSal_skutecnost',]
+hh2 <- hh[hh$mingrpset & hh$variable=='AvgSal_skutecnost',]
 hh2 <- RelabelGroups(hh2)
 plot <- ggplot(hh2, aes(Year, realchange-1, colour=grpcolour, group=grp)) +
   geom_line(size=1.5) +
@@ -168,6 +171,7 @@ plot <- ggplot(hh2, aes(Year, realchange-1, colour=grpcolour, group=grp)) +
   guides(colour=guide_legend(nrow=2,byrow=T)) +
   labs(title=NULL, x=NULL, y=NULL)
 plot
+SavePlot(plotname = 'ChangeSalReal_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
 # avg sal in 2013 prices
@@ -176,7 +180,7 @@ hh <- origdata
 title='Prumerny plat v cenach roku 2013'
 ylab='Platy v cenach 2013'
 xlab=''
-hh2 <- hh[hh$maxgrpset & hh$variable=='AvgSal_skutecnost',]
+hh2 <- hh[hh$mingrpset & hh$variable=='AvgSal_skutecnost',]
 hh2 <- RelabelGroups(hh2)
 plot <- ggplot(hh2, aes(Year, value*Infl2013Base, colour=grpcolour, group=grp)) +
   geom_line(size=1.5) +
@@ -185,8 +189,9 @@ plot <- ggplot(hh2, aes(Year, value*Infl2013Base, colour=grpcolour, group=grp)) 
   scale_y_continuous(labels=space) +
   scale_colour_identity(breaks=hh2$grpcolour,labels=hh2$grp,guide='legend') +
   guides(colour=guide_legend(nrow=2,byrow=T)) +
-  labs(title=NULL, x=xlab, y=ylab)
+  labs(title=NULL, x=NULL, y=NULL)
 plot
+SavePlot(plotname = 'AvgSal2013CZK_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
 # paybill adjusted for inflation by grp, outturn
@@ -201,8 +206,7 @@ plot <- ggplot(hh2,aes(Year, value/Infl2003Base, fill=grp, group=grp)) +
   scale_y_continuous(labels=comma) + 
   scale_x_date(breaks=yearbreaks42003_2012,labels=date_format('%Y'),
                limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
-  labs(title=title, x=xlab, y=ylab)
-plot
+  labs(title=NULL, x=NULL, y=NULL)
 plot
 ```
 
@@ -224,6 +228,7 @@ plot <- ggplot(hh2, aes(Year, -(value-1), fill=grpcolour, group=grp)) +
                limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
   labs(title=NULL, x=xlab, y=ylab)
 plot
+SavePlot(plotname = 'StaffGapPerc_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
 # Paybill over/underspend by grp (%)
@@ -231,7 +236,7 @@ plot
 title='Rozdíl ve výdajích na platy mezi rozpočtem a skutečností, 2003-12'
 ylab='% rozdíl'
 xlab=''
-hh2 <- hh[!hh$sgrp & (hh$Year!='2013-01-01' & hh$variable=='Platy_upr2skut'),]
+hh2 <- hh[hh$mingrp & (hh$Year!='2013-01-01' & hh$variable=='Platy_upr2skut'),]
 hh2 <- hh2[with(hh2, order(grp)), ]
 plot <- ggplot(hh2, aes(Year, -(value-1), fill=grpcolour, group=grp)) +
 
@@ -242,6 +247,7 @@ plot <- ggplot(hh2, aes(Year, -(value-1), fill=grpcolour, group=grp)) +
                limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
   labs(title=NULL, x=xlab, y=ylab)
 plot
+SavePlot(plotname = 'PaybillUnderspends_2003-12_grp_all',ploth=10, plotw=15,plotformat = 'png',)
 ```
 
 # staff gap by grp, abs
@@ -294,7 +300,7 @@ title='Rozdíl mezi rozpočtovaným a skutečným platem
 (upravený rozpočet vs. skutečnost)'
 ylab='rozdíl měsíčního platu (Kč)'
 xlab=''
-hh2 <- hh[hh$variable=='AvgSal_uprMinusskut' & hh$maxgrpset,]
+hh2 <- hh[hh$variable=='AvgSal_uprMinusskut' & hh$mingrpset,]
   
 plot <- ggplot(hh2, aes(Year, -value, group=grp,fill=grpcolour)) +
   geom_bar(stat='identity') +
@@ -332,14 +338,15 @@ plot
 
 # Real salary changes, by group
 ``` {r Real salary change by grp}
+hh <- origdata
 hh2 <- hh[hh$variable=='AvgSal_skutecnost' & hh$maxgrpset,]
-plot <- ggplot(hh2, aes(x=Year, y=realchange-1, fill=grpcolour)) +
-  geom_line(stat='identity') +
+plot <- ggplot(hh2, aes(x=Year, y=realchange-1)) +
+  geom_line(stat='identity',size=1.5) +
   scale_y_continuous(label=percent) +
   facet_wrap(~grp,nrow=2) + 
   scale_x_date(breaks=yearbreaks42003_2012,labels=date_format('%Y'),
                limits = c(as.Date("2003-01-01"), as.Date('2012-01-01'))) +
-  scale_fill_identity(breaks=hh2$grpcolour,labels=hh2$grp,guide='none') +
+  scale_colour_identity(breaks=hh2$grpcolour,labels=hh2$grp,guide='none') +
   labs(title=NULL, x=NULL, y=NULL)
 plot
 ```
@@ -368,7 +375,7 @@ title='Plat ve státní správě ve vztahu k průměrnému platu v ČR/Praze,
 podle typu organizace, 2003-2013 (schválený rozpočet)' 
 ylab='% rozdíl od průměrné mzdy v ČR (v Praze pro ústřední orgány)'
 xlab=''
-hh2 <- hh[(hh$variable=='AvgSal_skutecnost') & hh$maxgrpset & !is.na(hh$value),]
+hh2 <- hh[(hh$variable=='AvgSal_skutecnost') & hh$mingrpset & !is.na(hh$value),]
 hh2$relevavgsal <- hh2$czsal_all
 hh2$relevavgsal[hh2$UO] <- hh2$phasal_all[hh2$UO]
 hh2$grp2 <- paste0(hh2$grpcolour,hh2$variable)
@@ -386,3 +393,4 @@ plot
 SavePlot(plotname = 'Sal_perc_of_national',ploth=10, plotw=15,plotformat = 'png',)
 
 ```
+

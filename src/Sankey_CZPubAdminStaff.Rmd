@@ -59,5 +59,3 @@ sankeyPlotR$set(
 sankeyPlotR
 sankeyPlotR$print('blah', include_assets = TRUE, cdn=TRUE)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
