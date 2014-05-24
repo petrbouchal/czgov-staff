@@ -1,0 +1,23 @@
+---
+title: "rCharts test: MF superdata by grouping"
+output: html_document
+---
+
+``` {r Knitr prep, cache=FALSE,include=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE, dev='cairo_pdf', warning=FALSE)
+```
+
+```{r}
+library(rCharts)
+library(dplyr)
+source('./src/lib/lib_PubFinCZ_light.R')
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

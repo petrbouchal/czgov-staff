@@ -8,7 +8,7 @@ http://bost.ocks.org/mike/sankey/
 
 .node rect {
   cursor: move;
-  fill-opacity: .9;
+  fill-opacity: 1;
   shape-rendering: crispEdges;
   stroke-width: 0;
 }
@@ -30,4 +30,5 @@ http://bost.ocks.org/mike/sankey/
 
 svg {
   font: 10px sans-serif;
+  font-weight: bold;
 }

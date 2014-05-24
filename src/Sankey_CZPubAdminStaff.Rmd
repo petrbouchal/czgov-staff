@@ -3,59 +3,86 @@ title: "SankeyPlots"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r Load packages}
+library(rCharts)
+library(googleVis)
+library(dplyr)
+```
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r Sankey Google Charts}
-require(googleVis)
+```{r Load & fix data}
+# budget
 rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
-plot (
-  gvisSankey(from = 'source',to = 'target', weight = 'value', data = rozp,
-             options = list(width=800))
-  )
+colnames(rozp) <- c('source','target','value')
+rozp2 <- rozp
+# rozp <- group_by(rozp, source) %.%
+#   mutate(value_source = sum(value),
+#          newsource = paste0(source, ', ', round(value_source,0))) %.%
+#   ungroup() %.%
+#   group_by(target) %.%
+#   mutate(value_target = value,
+#          newtarget = paste0(target, ', ', round(value_target,0)))
+# 
+# rozp2 <- rozp[c(5,7,3)]
+# colnames(rozp2) <- c('source','target','value')
+
+# public sector
+vs <- read.csv('./data-input/VerejnySektor.csv')
+colnames(vs) <- c('source','target','value')
+vs2 <- vs
+# vs <- group_by(vs, source) %.%
+#   mutate(value_source = sum(value),
+#          newsource = paste0(source, ', ', round(value_source,0))) %.%
+#   ungroup() %.%
+#   group_by(target) %.%
+#   mutate(value_target = value,
+#          newtarget = paste0(target, ', ', round(value_target,0)))
+# 
+# vs2 <- vs[c(5,7,3)]
+# colnames(vs2) <- c('source','target','value')
 
 ```
 
-
-```{r rChart Sankey Verejny sektor}
-library(rCharts)
-rozp <- read.csv('./data-input/VerejnySektor.csv')
-colnames(rozp) <- c('source','target','value')
+```{r rChart Sankey Rozpocet}
 sankeyPlotVS <- rCharts$new()
 sankeyPlotVS$setLib('./src/rCharts_d3_sankey-gh-pages/')
-sankeyPlotVS$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart.html")
+sankeyPlotVS$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart_pb.html")
 
 sankeyPlotVS$set(
-  data = rozp,
-  nodeWidth = 5,
+  data = rozp2,
+  nodeWidth = 15,
   nodePadding = 10,
   layout = 99,
   width = 750,
-  height = 500
+  height = 500,
+  units = "tisíc"
 )
  
 sankeyPlotVS
 sankeyPlotVS$print('blah', include_assets = TRUE, cdn=TRUE)
 ```
 
-```{r rChart Sankey Rozpocet}
-library(rCharts)
-rozp <- read.csv('./data-input/RozpoctovaRegulace.csv')
-colnames(rozp) <- c('source','target','value')
+```{r rChart Sankey Verejny sektor}
 sankeyPlotR <- rCharts$new()
 sankeyPlotR$setLib('./src/rCharts_d3_sankey-gh-pages/')
-sankeyPlotR$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart.html")
+sankeyPlotR$setTemplate(script = "./src/rCharts_d3_sankey-gh-pages/layouts/chart_pb.html")
 
 sankeyPlotR$set(
-  data = rozp,
-  nodeWidth = 5,
+  data = vs2,
+  nodeWidth = 15,
   nodePadding = 10,
   layout = 99,
   width = 750,
-  height = 500
+  height = 500,
+  units = 'tisíc'
 )
  
 sankeyPlotR
 sankeyPlotR$print('blah', include_assets = TRUE, cdn=TRUE)
+```
+
+```{r Sankey Google Charts}
+plot (
+  gvisSankey(from = 'source',to = 'target', weight = 'value', data = rozp2,
+             options = list(width=800))
+  )
 ```

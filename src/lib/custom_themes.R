@@ -19,7 +19,7 @@ theme_PB <- theme_few()+
         legend.key.height=unit(.3,'cm'),
         legend.text = element_text(vjust=.5),
         legend.background=element_blank(),
-        panel.margin=unit(c(1,1,1,1),'mm'),
+        panel.margin=unit(c(2.5,2.5,1,1),'mm'),
         panel.border=element_blank(),
         panel.background=element_blank(),
         plot.background=element_rect(fill=NA,colour=NA),

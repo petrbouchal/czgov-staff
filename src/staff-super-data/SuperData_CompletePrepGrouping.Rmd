@@ -6,7 +6,7 @@ uu <- uu0
 
 # MV & MZV cause distortions (2011-12 reclass's) - exclude?
 
-excludeMVaMZV <- FALSE
+excludeMVaMZV <- TRUE
 
 uu$todiscard <- FALSE
 uu$todiscard[uu$KapAbb=='MV'] <- TRUE

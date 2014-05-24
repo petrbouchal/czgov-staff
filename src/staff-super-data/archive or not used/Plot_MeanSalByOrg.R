@@ -1,4 +1,4 @@
-source('./src/lib/lib_PubFinCZ.R')
+source('./src/lib/lib_PubFinCZ_light.R')
 
 uu <- LoadDataforPlotting('orgs')
 uu <- LoadDataforPlotting('chapters')
