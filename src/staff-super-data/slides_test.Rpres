@@ -1,8 +1,8 @@
 Test presentation
 ========================================================
-author: John Doe
+author: Petr Bouchal
 font-import: http://fonts.googleapis.com/css?family=Source Sans Pro
-font-family: 'Source Sans Pro'
+# font-family: 'New Cicle'
 transition: zoom
 transition-speed: slow
 

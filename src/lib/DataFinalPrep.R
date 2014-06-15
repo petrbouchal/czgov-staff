@@ -24,7 +24,7 @@ DataFinalPrep <- function (exclusion = T) {
   hh$maxgrpset[hh$grp %in% maxgrpset] <- TRUE
   
   # add colors for each layer of civil service
-  groupcolours <- fread('./data-input/groupcolours.csv')
+  groupcolours <- read.csv('./data-input/groupcolours.csv')
   uu <- merge(hh,groupcolours,all.x=T)
   
   return(uu)

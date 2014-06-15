@@ -1,8 +1,8 @@
 Test presentation
 ========================================================
-author: John Doe
+author: Petr Bouchal
 font-import: http://fonts.googleapis.com/css?family=Source Sans Pro
-font-family: 'Source Sans Pro'
+# font-family: 'New Cicle'
 transition: zoom
 transition-speed: slow
 
@@ -36,12 +36,10 @@ summary(cars)
  Max.   :25.0   Max.   :120  
 ```
 
-
 Slide With Plot
 ========================================================
 
 ![plot of chunk unnamed-chunk-2](slides_test-figure/unnamed-chunk-2.png) 
-
 
 Slide with table
 ====================

@@ -28,7 +28,7 @@ all <- DataFinalPrep(exclusion = F)
 all <- filter(all,(Year=='2010-01-01' | Year=='2011-01-01')) %>%
   filter((variable=='Platy_skutecnost' | variable=='Zam_skutecnost' | variable=='AvgSal_skutecnost')) %>%
   group_by(grp,variable) %>%
-  arrange(Year) %>%
+  arrange(grp,variable,Year) %>%
 #   select(grp, Year, variable, value, mingrpset) %>%
   mutate(change=value/lag(value)-1)
 ```
@@ -49,13 +49,13 @@ plot <- ggplot(all3[!all3$sgrp,],
   geom_abline(intecept=0,slope=1,linetype='dashed') +
   geom_text(aes(label=grp,hjust=0,x=AvgSal_skutecnost+.004),size=4) +
   geom_point(aes(label=grp),size=3) +
+  coord_fixed() +
   scale_y_continuous(limits=c(-.08,.08),labels=percent, breaks=breakset) +
   scale_x_continuous(limits=c(-.08,.08),labels=percent, breaks=breakset) +
+  scale_colour_identity(guide='none',breaks=all3$grpculour) +
   labs(y='Změna počtu zaměstnanců, 2010-2011') +
   labs(x='Změna průměrného platu, 2010-2011') +
-  scale_colour_identity(guide='none',breaks=all3$grpcoulour) +
-  theme(panel.grid.major.x=element_line()) +
-  coord_fixed()
+  theme(panel.grid.major.x=element_line())
 plot
 
 SavePlot(plotname = 'BalanceOfChanges_2010-12_grp',plotw=12,ploth=12, plotformat = 'png')
